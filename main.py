@@ -7,7 +7,7 @@ import loss
 REF_FILE = "/home/sara/Documents/GitHub/Pipeline/ref.csv" #chemin du fichier csv référence
 
 def wait_for_download(download_dir, timeout=30):
-    """ attend que le fichier soit compeletement téléchargé """
+    """ attend que le fichier soit compelètement téléchargé """
     end_time = time.time() + timeout
     while time.time() < end_time:
         files = os.listdir(download_dir)
@@ -32,6 +32,7 @@ if __name__ == "__main__":
         if zip_path:
             print(f"fichier ZIP téléchargé : {zip_path}")
             loss.main(zip_path, REF_FILE)
+            os.remove(zip_path) #supprime de fichier zip téléchargé
         else:
             print("aucun fichier zip trouvé")
     finally:
