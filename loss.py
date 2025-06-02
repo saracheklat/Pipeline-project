@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from zipfile import ZipFile
+import shutil
 
 REF_FILE_PATH = "/home/sara/Documents/GitHub/Pipeline/ref.csv"
 
@@ -10,6 +11,8 @@ def extract_zip(zip_file):
     Extrait le contenu du zip dans un dossier nommé comme le zip
     """
     extract_directory = os.path.splitext(zip_file)[0]
+    if os.path.exists(extract_directory):
+        shutil.rmtree(extract_directory)
     os.makedirs(extract_directory, exist_ok=True)  # créer le dossier s'il n'existe pas
 
     try:
