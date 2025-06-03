@@ -12,7 +12,7 @@ def extract_zip(zip_file):
     """
     extract_directory = os.path.splitext(zip_file)[0]
     if os.path.exists(extract_directory):
-        shutil.rmtree(extract_directory)
+        shutil.rmtree(extract_directory) #supprime le fichier zip déja téléchargé
     os.makedirs(extract_directory, exist_ok=True)  # créer le dossier s'il n'existe pas
 
     try:
