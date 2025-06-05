@@ -40,7 +40,7 @@ class UniversiticeDownloader:
         time.sleep(5)
         self._click_element(By.CLASS_NAME, "btn-login")
         self._click_element(By.CLASS_NAME, "btn")
-        time.sleep(10)
+        time.sleep(5)
         try:
             self.wait.until(EC.presence_of_element_located((By.ID, "username")))
         except TimeoutException:
@@ -55,7 +55,7 @@ class UniversiticeDownloader:
 
     def expand_section(self, by, value, section_plt):
         try:
-            depot = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((by, value)))
+            depot = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((by, value)))
             depot.click()
         except TimeoutException:
             self._click_element(By.PARTIAL_LINK_TEXT, section_plt)
