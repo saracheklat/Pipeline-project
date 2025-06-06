@@ -12,12 +12,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
 
-load_dotenv()
+load_dotenv(dotenv_path='/home/sara/Documents/GitHub/Pipeline/.env')
+
 
 class UniversiticeDownloader:
     def __init__(self):
-        self.download_dir = "/home/sara/Documents/GitHub/Pipeline" #chemin du téléchargement
-
+        self.download_dir = "/home/sara/Documents/GitHub/Pipeline"  #le chemin du dossier de téléchargement
         self.driver = self._configure_driver()
         self.wait = WebDriverWait(self.driver, 10)
 
@@ -31,16 +31,21 @@ class UniversiticeDownloader:
             "download.directory_upgrade": True,
             "plugins.always_open_pdf_externally": True
         }
+        
         options.add_argument("--headless=new") 
         options.add_experimental_option("prefs", prefs)
-        return webdriver.Chrome(
-         options=options
-        )
+        return webdriver.Chrome( options=options)
 
     def login(self):
         self.driver.get("https://universitice.univ-rouen.fr/")
+        time.sleep(5)
         self._click_element(By.CLASS_NAME, "btn-login")
         self._click_element(By.CLASS_NAME, "btn")
+        time.sleep(5)
+        try:
+            self.wait.until(EC.presence_of_element_located((By.ID, "username")))
+        except TimeoutException:
+            print("Champ username introuvable !")
         self._fill_input(By.ID, "username", os.getenv("UNIV_USERNAME"))
         self._fill_input(By.ID, "password", os.getenv("UNIV_PASSWORD") + Keys.ENTER)
 
@@ -51,7 +56,7 @@ class UniversiticeDownloader:
 
     def expand_section(self, by, value, section_plt):
         try:
-            depot = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((by, value)))
+            depot = WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((by, value)))
             depot.click()
         except TimeoutException:
             self._click_element(By.PARTIAL_LINK_TEXT, section_plt)
