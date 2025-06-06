@@ -4,8 +4,7 @@ import time
 import os
 import loss
 import csv
-#from oauth2client.service_account import ServiceAccountCredentials
-#import gspread
+
 
 REF_FILE = "/home/sara/Documents/GitHub/Pipeline/ref.csv" #chemin du fichier csv référence
 
