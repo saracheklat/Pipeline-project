@@ -105,3 +105,17 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 ```
+
+## Structure du projet
+Pipeline-project/
+│
+├── main.py                 # Script principal de téléchargement et d'évaluation
+├── downloader.py           # Classe UniversiticeDownloader (bot Selenium)
+├── loss.py                 # Fonctions d'extraction, calcul des métriques et gestion des hashes
+├── .env                    # Fichier contenant les variables d'environnement
+├── requirements.txt        # Dépendances Python
+├── ref.csv                 # Fichier référence
+├── resultats.csv           # Résultats des évaluations
+└── hashes.csv              # Historique des hash des fichiers traités              
+
+
