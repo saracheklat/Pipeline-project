@@ -37,6 +37,6 @@ if __name__ == "__main__":
             os.remove(zip_path)
 
         else:
-            print("Aucun fichier zip trouvé")
+            print("aucun fichier zip trouvé")
     finally:
         downloader.close()
