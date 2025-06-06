@@ -31,6 +31,7 @@ Install my-project with npm
 ```bash
   git clone https://github.com/Pipeline-project.git
   cd Pipeline-project
+```
 
 # créer et activer un environnement virtuel
   python -m venv venv
