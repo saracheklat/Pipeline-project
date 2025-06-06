@@ -5,6 +5,7 @@ from zipfile import ZipFile
 import shutil
 import hashlib
 
+
 REF_FILE_PATH = "/home/sara/Documents/GitHub/Pipeline/ref.csv"
 HASH_STORE_FILE = "/home/sara/Documents/GitHub/Pipeline/hashes.csv"
 RESULTS_FILE = "/home/sara/Documents/GitHub/Pipeline/resultats.csv"
