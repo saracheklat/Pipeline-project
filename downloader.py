@@ -31,7 +31,7 @@ class UniversiticeDownloader:
             "download.directory_upgrade": True,
             "plugins.always_open_pdf_externally": True
         }
-        #options.add_argument("--headless=new") 
+        options.add_argument("--headless=new") 
         options.add_experimental_option("prefs", prefs)
         return webdriver.Chrome( options=options)
 
