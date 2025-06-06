@@ -8,7 +8,7 @@ import csv
 
 REF_FILE = "/home/sara/Documents/GitHub/Pipeline/ref.csv" #chemin du fichier csv référence
 
-def wait_for_download(download_dir, timeout=30):
+def wait_for_download(download_dir, timeout=15):
     """ attend que le fichier soit compelètement téléchargé """
     end_time = time.time() + timeout
     while time.time() < end_time:
