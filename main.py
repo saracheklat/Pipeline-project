@@ -3,6 +3,9 @@ from selenium.webdriver.common.by import By
 import time
 import os
 import loss
+import csv
+#from oauth2client.service_account import ServiceAccountCredentials
+#import gspread
 
 REF_FILE = "/home/sara/Documents/GitHub/Pipeline/ref.csv" #chemin du fichier csv référence
 
@@ -28,12 +31,13 @@ if __name__ == "__main__":
         downloader._click_element(By.PARTIAL_LINK_TEXT, "travaux remis")
         downloader._click_element(By.PARTIAL_LINK_TEXT, "Télécharger")
 
-        zip_path = wait_for_download(downloader.download_dir) #récupere le fichier zip le dernier telechargé
+        zip_path = wait_for_download(downloader.download_dir)
         if zip_path:
             print(f"fichier ZIP téléchargé : {zip_path}")
             loss.main(zip_path, REF_FILE)
-            os.remove(zip_path) #supprime de fichier zip téléchargé
+            os.remove(zip_path)
+
         else:
-            print("aucun fichier zip trouvé")
+            print("Aucun fichier zip trouvé")
     finally:
         downloader.close()
