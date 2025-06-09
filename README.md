@@ -2,7 +2,7 @@
 # Pipeline d'extraction et d'évaluation automatique des travaux étudiants :mortar_board:
 
 
-Ce projet permet d'automatiser le téléchargement des travaux remis par les étudiants sur Universitice, extraire le fichier de depot ZIP, calculer les métriques MAE (Mean Absolute Error) et MSE (Mean Squared Error) pour évaluer les prédictions des étudiants par rapport à une référence .
+Ce projet permet d'automatiser le téléchargement des travaux remis par les étudiants sur Universitice, extraire le fichier de depot ZIP, calculer les métriques MAE (Mean Absolute Error) et MSE (Mean Squared Error) pour évaluer les prédictions des étudiants par rapport à une référence pour ensuite envoyer les résultas par mail.
 
 ## Fonctionnalités principales
 
