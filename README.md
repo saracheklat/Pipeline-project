@@ -15,6 +15,8 @@ Ce projet permet d'automatiser le téléchargement des travaux remis par les ét
 * Gestion de l'historique des fichiers via hash pour éviter le retraitement des fichiers
 
 * Sauvegarde des résultats dans un fichier CSV
+  
+* Envoie automatique des résultats par mail
 ## :closed_lock_with_key: Variables d'environnement
 
 
