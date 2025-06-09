@@ -4,6 +4,21 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from zipfile import ZipFile
 import shutil
 import hashlib
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+from dotenv import load_dotenv
+
+load_dotenv()  
+
+SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
+SMTP_SERVER = os.getenv("SMTP_SERVER")
+SMTP_PORT = int(os.getenv("SMTP_PORT", 587))  
+
+
 
 
 REF_FILE_PATH = "/home/sara/Documents/GitHub/Pipeline/ref.csv"
@@ -52,7 +67,7 @@ def is_file_processed(folder_std, file):
     return hash_file in processed_files
 
 def mark_file_processed(folder_std, file):
-    """Marque un fichier comme traité en ajoutant son hash au CSV"""
+    """Marque un fichier comme traité"""
     file_path = os.path.join(folder_std, file)
     hash_file = calculate_hash(file_path)
 
@@ -71,23 +86,71 @@ def mark_file_processed(folder_std, file):
     df = pd.DataFrame(processed_files, columns=["hashes"])
     df.to_csv(HASH_STORE_FILE, index=False)
 
+
+def send_email(reciever_email):
+    subject = "DEPOT TP"
+    message = "Bonjour \n" "veillez deposer un fichier au bon format svp"
+    try : 
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls() #securiser l'envoie des mail
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        obj_mail = MIMEText(message)
+        obj_mail['Subject'] = subject
+        obj_mail['From'] = SENDER_EMAIL
+        obj_mail['To'] = reciever_email
+        server.send_message(obj_mail)
+        server.quit()
+        print(f"email envoyé à {reciever_email}")
+    except smtplib.SMTPException as e: 
+        print(f"erreur lors de l'envoi du mail à  {reciever_email}: {e}")
+
+def send_email_with_attachment(receiver_email, attachment_path):
+    subject = "Résultats TP"
+    body = "Bonjour,\n\nVeuillez trouver ci-joint vos résultats.\n\nCordialement"
+    
+    try:
+        message = MIMEMultipart()
+        message["From"] = SENDER_EMAIL
+        message["To"] = receiver_email
+        message["Subject"] = subject
+
+        message.attach(MIMEText(body, "plain"))
+
+        with open(attachment_path, "rb") as attachment:
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment.read())
+        encoders.encode_base64(part)
+        part.add_header("Content-Disposition", f"attachment; filename= {os.path.basename(attachment_path)}")
+        message.attach(part)
+
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(SENDER_EMAIL, SENDER_PASSWORD)
+        server.send_message(message)
+        server.quit()
+
+        print(f"Mail avec pièce jointe envoyé à {receiver_email}")
+    except Exception as e:
+        print(f"Erreur envoi de mail à {receiver_email} : {e}")
+
+
 def calcul_loss(folder_std, ref_file):
     """
     Calcule MAE et MSE entre les prédictions d'un dossier étudiant et un fichier de référence CSV
     """
-
     try:
         df_ref = pd.read_csv(ref_file, sep=';')
         df_ref.dropna(inplace=True)
     except FileNotFoundError:
-        print("Le fichier de référence n'existe pas")
-        return
+        print("Le fichier de référence est introuvable")
+        return [], False
     except pd.errors.ParserError:
         print("Erreur lors de la lecture du fichier de référence")
-        return
+        return [], False
 
     resultats = []
     nom_etudiant = os.path.basename(folder_std).split('_')[0].strip()
+    has_new_valid_files = False
 
     # Lister les fichiers dans le dossier étudiant
     for file in os.listdir(folder_std):
@@ -95,9 +158,9 @@ def calcul_loss(folder_std, ref_file):
         if os.path.isdir(file_path):
             continue
 
-        # Si le fichier a déjà été traité, on le saute
+        # Si le fichier a déjà été traité, on passe au suivant
         if is_file_processed(folder_std, file):
-            print(f"Fichier {file} déjà traité")
+            print(f"Fichier {file} déjà traité - aucun mail ne sera envoyé")
             continue
 
         try:
@@ -112,7 +175,10 @@ def calcul_loss(folder_std, ref_file):
             print(f"Nombre de lignes incorrect dans {file_path} ({df_etu.shape[0]})")
             continue  # Ignore ce fichier
 
-        # Calcul des métriques MAE et MSE
+        # nouveau fichier valide
+        has_new_valid_files = True
+
+        # calcul des métriques MAE et MSE
         ligne = {"Nom étudiant": nom_etudiant, "Fichier": file}
         for index in [0, 1, 2]:
             num = f"prop{index + 1}"
@@ -126,28 +192,95 @@ def calcul_loss(folder_std, ref_file):
         # Marquer le fichier comme traité après calcul des métriques
         mark_file_processed(folder_std, file)
 
-    return resultats
+    return resultats, has_new_valid_files
 
-def main(zip_path, ref_file):
+def main(zip_path, ref_file, mail_path):
+    """
+    Fonction principale pour le traitement des fichiers csv et l'envoi des emails
+    """
+    # Extraction de l'archive
     folder = extract_zip(zip_path)
+    if not folder:
+        print("echec de l'extraction du fichier ZIP")
+        return
+
     resultats = []
+    emails_bons_format = set()
+    emails_mauvais_format = set()
+    emails_deja_traites = set()
 
-    if folder:
-        for folder_etu in os.listdir(folder):
-            folder_etu_path = os.path.join(folder, folder_etu)
-            if os.path.isdir(folder_etu_path):
-                resultat_etu = calcul_loss(folder_etu_path, ref_file)
-                if resultat_etu:
-                    resultats.extend(resultat_etu)
-
-    # Sauvegarder les résultats dans le fichier CSV
+    # Chargement des emails des etudiants à partir du fichier CSV
     try:
-        if resultats:
+        df_mails = pd.read_csv(mail_path)
+        dict_mails = dict(zip(df_mails["Nom"].str.lower().str.strip(), df_mails["Email"]))
+    except Exception as e:
+        print(f"Erreur lors de la lecture du fichier emails: {str(e)}")
+        return
+
+    # Traitement de chaque dossier étudiant
+    for folder_etu in os.listdir(folder):
+        folder_etu_path = os.path.join(folder, folder_etu)
+        if not os.path.isdir(folder_etu_path):
+            continue
+
+        # Récupération email étudiant
+        nom_etu = folder_etu.split("_")[0].strip().lower()
+        mail_etu = dict_mails.get(nom_etu)
+        
+
+        # Calcul des métriques
+        resultat_etu, has_new_valid_files = calcul_loss(folder_etu_path, ref_file)
+        
+        # Vérification des fichiers
+        has_any_valid_file = has_new_valid_files or any(
+            is_file_processed(folder_etu_path, f) 
+            for f in os.listdir(folder_etu_path) 
+            if not os.path.isdir(os.path.join(folder_etu_path, f))
+        )
+        
+        # Classification des étudiants
+        if has_new_valid_files:
+            resultats.extend(resultat_etu)
+            emails_bons_format.add(mail_etu)
+        elif not has_any_valid_file:
+            emails_mauvais_format.add(mail_etu)
+        else:
+            emails_deja_traites.add(mail_etu)
+
+    # Sauvegarde des résultats
+    if resultats:
+        try:
             df_resultats = pd.DataFrame(resultats)
-            # Lire les résultats existants
             if os.path.exists(RESULTS_FILE):
                 df_old = pd.read_csv(RESULTS_FILE)
                 df_resultats = pd.concat([df_old, df_resultats], ignore_index=True)
             df_resultats.to_csv(RESULTS_FILE, index=False)
-    except Exception as e:
-        print(f"Erreur lors de la sauvegarde des résultats : {e}")
+            print("résultat sauvegardé avec succès")
+        except Exception as e:
+            print(f"erreur lors de la sauvegarde des résultats{e}")
+    else:
+        print("aucun nouveau résultat à sauvegarder")
+
+    # Envoi des résultats aux étudiants avec fichiers valides
+    if emails_bons_format:
+        print("envoi des résultats aux étudiants")
+        for email in emails_bons_format:
+            try:
+                send_email_with_attachment(email, RESULTS_FILE)
+                print(f"{email}")
+            except Exception as e:
+                print(f"echec pour {email}: {str(e)}")
+    else:
+        print("aucun étudiant avec nouveau fichier valide")
+
+    # envoi de mail aux étudiants avec fichiers mal formatés
+    if emails_mauvais_format:
+        print("Envoi des avertissements:")
+        for email in emails_mauvais_format:
+            try:
+                send_email(email)
+                print(f"{email}")
+            except Exception as e:
+                print(f"echec pour {email}: {str(e)}")
+    else:
+        print("aucun avertissement à envoyer")

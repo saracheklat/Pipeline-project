@@ -7,6 +7,8 @@ import csv
 
 
 REF_FILE = "/home/sara/Documents/GitHub/Pipeline/ref.csv" #chemin du fichier csv référence
+MAIL_PATH = "/home/sara/Documents/GitHub/Pipeline/mails.csv" 
+
 
 def wait_for_download(download_dir, timeout=12):
     """ attend que le fichier soit compelètement téléchargé """
@@ -32,11 +34,16 @@ if __name__ == "__main__":
 
         zip_path = wait_for_download(downloader.download_dir)
         if zip_path:
-            print(f"fichier ZIP téléchargé : {zip_path}")
-            loss.main(zip_path, REF_FILE)
-            os.remove(zip_path)
+            print(f"Fichier ZIP téléchargé : {zip_path}")
 
+            # extraction des mails
+            downloader.get_email()
+            loss.main(zip_path, REF_FILE, MAIL_PATH)
+
+            #Suppression du fichier zip téléchargé    
+            os.remove(zip_path)
         else:
-            print("aucun fichier zip trouvé")
+            print("Aucun fichier zip trouvé")
+
     finally:
         downloader.close()

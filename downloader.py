@@ -1,7 +1,10 @@
 import os
 import time
 from dotenv import load_dotenv
+import pandas as pd
+import csv
 import tempfile
+import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -32,7 +35,7 @@ class UniversiticeDownloader:
             "plugins.always_open_pdf_externally": True
         }
         
-        options.add_argument("--headless=new") 
+        #options.add_argument("--headless=new") 
         options.add_experimental_option("prefs", prefs)
         return webdriver.Chrome( options=options)
 
@@ -67,6 +70,8 @@ class UniversiticeDownloader:
 
     def _click_element(self, by, value):
         element = self.wait.until(EC.element_to_be_clickable((by, value)))
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+        time.sleep(1)  
         element.click()
 
     def _fill_input(self, by, value, text):
@@ -77,11 +82,6 @@ class UniversiticeDownloader:
         element = self.wait.until(EC.element_to_be_clickable((by, value)))
         ActionChains(self.driver).move_to_element(element).click().perform()
 
-    def close(self):
-        time.sleep(2)
-        self.driver.quit()
-
-
     def get_downloaded_zip_path(self):
         """
         Retourne le chemin complet du dernier fichier zip téléchargé
@@ -90,4 +90,38 @@ class UniversiticeDownloader:
             if file.endswith(".zip"):
                 return os.path.join(self.download_dir, file) #chemin complet du fichier zip téléchargé
         return None
+    
+    def close(self):
+        time.sleep(2)
+        self.driver.quit()
+    
+    def get_email(self):
+        time.sleep(2)
+        rows = self.driver.find_elements(By.CSS_SELECTOR, "tr")
+        data = []
 
+        for i, row in enumerate(rows):
+            tds = row.find_elements(By.TAG_NAME, "td")
+
+            # On filtre les lignes qui n'ont pas les bonnes colonnes (ex: lignes d'arbre ou vides)
+            classes_td = [td.get_attribute("class") for td in tds]
+            if not any("cell c2" in td_class for td_class in classes_td):
+                continue
+
+            try:
+                nom = row.find_element(By.CSS_SELECTOR, "td.cell.c2").text.strip()
+                email = row.find_element(By.CSS_SELECTOR, "td.cell.c4.email").text.strip()
+                data.append((nom, email))
+            except Exception as e:
+                print(f"Erreur à la ligne {i} : {e}")
+
+        # Sauvegarde dans un fichier CSV
+        output_path = "mails.csv"
+        with open(output_path, mode="w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["Nom", "Email"])
+            writer.writerows(data)
+
+        print(f"Emails extraits et sauvegardés avec succès dans : {output_path}")
+
+         
