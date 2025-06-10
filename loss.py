@@ -59,7 +59,7 @@ def is_file_processed(folder_std, file):
     # Charger les hashes déjà présents dans le fichier CSV
     if os.path.exists(HASH_STORE_FILE):
         df = pd.read_csv(HASH_STORE_FILE)
-        processed_files = set(df['hashes'])  # Utilise un set pour les hashes existants
+        processed_files = set(df['hashes']) 
     else:
         processed_files = set()  # Si le fichier n'existe pas, on considère qu'aucun fichier n'est traité
 
@@ -74,7 +74,7 @@ def mark_file_processed(folder_std, file):
     # Charger les hashes déjà présents dans le fichier CSV
     if os.path.exists(HASH_STORE_FILE):
         df = pd.read_csv(HASH_STORE_FILE)
-        processed_files = set(df['hashes'])  # Utilise un set pour les hashes existants
+        processed_files = set(df['hashes'])  
     else:
         processed_files = set()  # Si le fichier n'existe pas, on considère qu'aucun fichier n'est traité
 
@@ -106,7 +106,7 @@ def send_email(reciever_email):
 
 def send_email_with_attachment(receiver_email, attachment_path):
     subject = "Résultats TP"
-    body = "Bonjour,\n\nVeuillez trouver ci-joint vos résultats.\n\nCordialement"
+    body = "Bonjour,\n\nVeuillez trouver ci-joint les résultats du TP Machine learning\n\nCordialement"
     
     try:
         message = MIMEMultipart()
@@ -160,7 +160,7 @@ def calcul_loss(folder_std, ref_file):
 
         # Si le fichier a déjà été traité, on passe au suivant
         if is_file_processed(folder_std, file):
-            print(f"Fichier {file} déjà traité - aucun mail ne sera envoyé")
+            print(f"Fichier {file} déjà traité")
             continue
 
         try:
@@ -169,11 +169,11 @@ def calcul_loss(folder_std, ref_file):
                 df_etu = pd.read_csv(file_path, sep=',', header=None)
         except Exception as e:
             print(f"Erreur lors de la lecture du fichier {file_path}")
-            continue  # Ignore ce fichier
+            continue 
 
         if df_etu.shape[0] != df_ref.shape[0]:
             print(f"Nombre de lignes incorrect dans {file_path} ({df_etu.shape[0]})")
-            continue  # Ignore ce fichier
+            continue 
 
         # nouveau fichier valide
         has_new_valid_files = True
