@@ -17,7 +17,6 @@ from selenium.common.exceptions import TimeoutException
 
 load_dotenv(dotenv_path='/home/sara/Documents/GitHub/Pipeline/.env')
 
-
 class UniversiticeDownloader:
     def __init__(self):
         self.download_dir = "/home/sara/Documents/GitHub/Pipeline"  #le chemin du dossier de téléchargement
