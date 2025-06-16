@@ -1,0 +1,9 @@
+
+{
+  "send_mails": false,
+  "course_name": "Bac à sable",
+  "ref_file": "/home/bilalmay/Téléchargements/reference.csv",
+  "download_dir": "/home/bilalmay/Téléchargements",
+  "results_file": "/home/bilalmay/Téléchargements/resultats.csv",
+  "emails_file": "mails.csv"
+}
