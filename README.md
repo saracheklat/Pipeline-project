@@ -65,6 +65,14 @@ Dans le fichier loss.py, personnalisez les chemins suivants :
 Dans la classe UniversiticeDownloader (downloader.py), configurez :
 
     download_dir : dossier ou le fichier de depot ZIP sera téléchargé
+
+## Google Sheets - Publication des résultats
+
+* Le fichier google_sheets.py contient la fonction update_google_sheet_from_csv()
+* Ce script publie le fichier resultats.csv dans un Google Sheet nommé CSV_to_google_sheet
+* Le lien de partage est généré automatiquement et envoyé par email aux étudiants avec depot valide
+* Le partage est en lecture seule
+
     
 ## :alarm_clock: Automatisation avec cron
 
@@ -109,6 +117,7 @@ git clone https://github.com/Pipeline-project.git
 cd Pipeline-projectpython -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+
 
 ```
 
