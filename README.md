@@ -6,17 +6,19 @@ Ce projet permet d'automatiser le téléchargement des travaux remis par les ét
 
 ## Fonctionnalités principales
 
-* Téléchargement automatique des travaux au format ZIP depuis Universitice via un bot Selenium
+
+* Connexion automatique à Universitice via Selenium
+* Téléchargement automatique des mails des etudiants et travaux au format ZIP depuis Universitice via un bot Selenium
 
 * Extraction du fichier ZIP avec suppression automatique des dossiers ancients
 
-* Calcul des métriques MAE et MSE pour chaque fichier csv avec gestion des erreurs de lecture
+* Calcul des métriques MAE (Mean Absolute Error) et MSE (Mean Squared Error) pour chaque fichier csv avec gestion des erreurs de lecture
 
 * Gestion de l'historique des fichiers via hash pour éviter le retraitement des fichiers
 
 * Sauvegarde des résultats dans un fichier CSV
   
-* Alerte mail aux étudiants ayant soumis des fichiers invalides
+* Alerte mail aux étudiants avec fichier invalide
 * Envoi du lien Google Sheet aux étudiants ayant soumis des fichiers valides
   
 ## :closed_lock_with_key: Variables d'environnement
