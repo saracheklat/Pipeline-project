@@ -17,7 +17,6 @@ from selenium.common.exceptions import TimeoutException
 
 load_dotenv(dotenv_path='/home/sara/Documents/GitHub/Pipeline/.env')
 
-
 class UniversiticeDownloader:
     def __init__(self):
         self.download_dir = "/home/sara/Documents/GitHub/Pipeline"  #le chemin du dossier de téléchargement
@@ -103,7 +102,7 @@ class UniversiticeDownloader:
         for i, row in enumerate(rows):
             tds = row.find_elements(By.TAG_NAME, "td")
 
-            # On filtre les lignes qui n'ont pas les bonnes colonnes (ex: lignes d'arbre ou vides)
+            #  filtre les lignes qui n'ont pas les bonnes colonnes
             classes_td = [td.get_attribute("class") for td in tds]
             if not any("cell c2" in td_class for td_class in classes_td):
                 continue
@@ -115,13 +114,13 @@ class UniversiticeDownloader:
             except Exception as e:
                 print(f"Erreur à la ligne {i} : {e}")
 
-        # Sauvegarde dans un fichier CSV
+        # Sauvegarde dans un fichier CSV 
         output_path = "mails.csv"
         with open(output_path, mode="w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(["Nom", "Email"])
             writer.writerows(data)
 
-        print(f"Emails extraits et sauvegardés avec succès dans : {output_path}")
+        print(f"mails sauvegardés avec succès dans : {output_path}")
 
          
