@@ -2,7 +2,7 @@
 # Pipeline d'extraction et d'évaluation automatique des travaux étudiants :mortar_board:
 
 
-Ce projet permet d'automatiser le téléchargement des travaux remis par les étudiants sur Universitice, extraire le fichier de depot ZIP, calculer les métriques MAE (Mean Absolute Error) et MSE (Mean Squared Error) pour évaluer les prédictions des étudiants par rapport à une référence pour ensuite envoyer les résultas par mail.
+Ce projet permet d'automatiser le téléchargement des travaux remis par les étudiants sur Universitice, extraire le fichier de depot ZIP, calculer les métriques MAE (Mean Absolute Error) et MSE (Mean Squared Error) pour évaluer les prédictions des étudiants par rapport à une référence pour ensuite envoyer un lien vers un Google Sheet partagé avec les étudiants.
 
 ## Fonctionnalités principales
 
@@ -16,7 +16,9 @@ Ce projet permet d'automatiser le téléchargement des travaux remis par les ét
 
 * Sauvegarde des résultats dans un fichier CSV
   
-* Envoie automatique des résultats par mail
+* Alerte mail aux étudiants ayant soumis des fichiers invalides
+* Envoi du lien Google Sheet aux étudiants ayant soumis des fichiers valides
+  
 ## :closed_lock_with_key: Variables d'environnement
 
 
@@ -114,6 +116,7 @@ Pipeline-project/
 ├── main.py                 # Script principal de téléchargement et d'évaluation
 ├── downloader.py           # Classe UniversiticeDownloader (bot Selenium)
 ├── loss.py                 # Fonctions d'extraction, calcul des métriques et gestion des hashes
+├── google_sheets.py        # Fonctions Google Sheets
 ├── .env                    # Fichier contenant les variables d'environnement
 ├── requirements.txt        # Dépendances Python
 ├── ref.csv                 # Fichier référence
