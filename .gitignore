@@ -2,3 +2,8 @@
 *.txt
 *.json
 *.env
+test_env/
+*.odt
+__pycache__/
+test_env/
+*.odt/
